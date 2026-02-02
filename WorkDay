@@ -1,0 +1,66 @@
+<?php
+
+function generateWorkSchedule($year, $month, $numMonths = 1) {
+    $monthNames = [
+        1 => 'Январь', 2 => 'Февраль', 3 => 'Март', 4 => 'Апрель',
+        5 => 'Май', 6 => 'Июнь', 7 => 'Июль', 8 => 'Август',
+        9 => 'Сентябрь', 10 => 'Октябрь', 11 => 'Ноябрь', 12 => 'Декабрь'
+    ];
+
+    $isWorkDay = true;
+    $skipDays = 0;
+
+    for ($m = 0; $m < $numMonths; $m++) {
+        $currentMonth = $month + $m;
+        $currentYear = $year;
+
+        if ($currentMonth > 12) {
+            $currentMonth -= 12;
+            $currentYear++;
+        }
+
+        $numDays = cal_days_in_month(CAL_GREGORIAN, $currentMonth, $currentYear);
+
+        echo "\n" . $monthNames[$currentMonth] . " " . $currentYear . "\n";
+
+        for ($day = 1; $day <= $numDays; $day++) {
+            $dateObj = new DateTime("$currentYear-$currentMonth-$day");
+            $dayOfWeek = (int)$dateObj->format('N');
+
+            if ($skipDays > 0) {
+                $skipDays--;
+                echo $day . " ";
+                continue;
+            }
+
+            if ($isWorkDay) {
+                if ($dayOfWeek >= 6) {
+                    echo $day . " ";
+                } else {
+                    echo $day . "(+) ";
+                    $isWorkDay = false;
+                    $skipDays = 2;
+                }
+            } else {
+                echo $day . " ";
+            }
+        }
+        echo "\n";
+    }
+}
+
+$year = (int)($argv[1] ?? date('Y'));
+$month = (int)($argv[2] ?? date('m'));
+$numMonths = (int)($argv[3] ?? 1);
+
+if ($month < 1 || $month > 12) {
+    echo "Ошибка: месяц должен быть от 1 до 12.\n";
+    exit(1);
+}
+if ($numMonths < 1) {
+    echo "Ошибка: количество месяцев должно быть ≥ 1.\n";
+    exit(1);
+}
+
+generateWorkSchedule($year, $month, $numMonths);
+?>
