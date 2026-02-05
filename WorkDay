@@ -44,6 +44,10 @@ function generateWorkSchedule($year, $month, $numMonths = 1) {
             } else {
                 echo $day . " ";
             }
+
+            if ($skipDays === 0 && !$isWorkDay) {
+                $isWorkDay = true;
+            }
         }
         echo "\n";
     }
